@@ -1,0 +1,52 @@
+# Node modules and package managers
+node_modules/
+**/node_modules/
+.pnp/
+.pnp.js
+.pnpm-debug.log*
+.yarn/
+.yarnrc.yml
+.yarnrc
+.yarn-debug.log*
+.yarn-error.log*
+.yarn-integrity
+.yarn-cache/
+.yarn-local/
+.yarn-unplugged/
+.yarn-offline-mirror/
+.yarn-v*
+.bun/
+.bunfig.toml
+
+# Build output
+dist/
+**/dist/
+.next/
+**/.next/
+out/
+**/out/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Lockfiles
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+shrinkwrap.yaml
+
+# Env files
+.env
+.env.*
+apps/api/.env
+apps/web/.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Turbo/monorepo cache
+.turbo/ 
