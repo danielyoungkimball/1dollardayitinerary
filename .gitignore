@@ -49,4 +49,4 @@ apps/web/.env
 Thumbs.db
 
 # Turbo/monorepo cache
-.turbo/ 
+.turbo/
