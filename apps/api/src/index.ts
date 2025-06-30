@@ -291,7 +291,28 @@ async function generatePDF(itinerary: GeneratedItinerary): Promise<Buffer> {
       </html>
     `;
     console.log('[PDF] HTML template:', htmlTemplate);
-    const browser = await puppeteer.launch({ headless: true });
+    
+    // Puppeteer configuration for different environments
+    const puppeteerOptions: any = {
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process',
+        '--disable-gpu'
+      ]
+    };
+
+    // In production, let Puppeteer find Chrome automatically
+    if (process.env.NODE_ENV === 'production') {
+      console.log('[PDF] Running in production mode - using system Chrome');
+    }
+
+    const browser = await puppeteer.launch(puppeteerOptions);
     const page = await browser.newPage();
     await page.setContent(htmlTemplate);
     const pdf = await page.pdf({ format: 'A4', margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' } });
@@ -426,6 +447,50 @@ app.post('/test-openai', async (req, res) => {
     res.status(500).json({ 
       status: 'error', 
       error: err.message
+    });
+  }
+});
+
+// Test endpoint to verify Puppeteer is working
+app.get('/test-puppeteer', async (req, res) => {
+  try {
+    console.log('[TEST-PUPPETEER] Testing Puppeteer...');
+    
+    const puppeteerOptions: any = {
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process',
+        '--disable-gpu'
+      ]
+    };
+
+    if (process.env.NODE_ENV === 'production') {
+      console.log('[TEST-PUPPETEER] Running in production mode');
+    }
+
+    const browser = await puppeteer.launch(puppeteerOptions);
+    const page = await browser.newPage();
+    await page.setContent('<h1>Puppeteer Test</h1>');
+    const pdf = await page.pdf({ format: 'A4' });
+    await browser.close();
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=test.pdf');
+    res.send(pdf);
+    
+    console.log('[TEST-PUPPETEER] Puppeteer test successful');
+  } catch (error) {
+    console.error('[TEST-PUPPETEER] Puppeteer test failed:', error);
+    res.status(500).json({ 
+      status: 'error', 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
     });
   }
 });

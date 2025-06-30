@@ -3,8 +3,12 @@ services:
     name: 1dollardayitinerary-api
     env: node
     plan: free
-    buildCommand: cd apps/api && npm install && npm run build
+    buildCommand: cd apps/api && npm install && npx puppeteer browsers install chrome && npm run build
     startCommand: cd apps/api && npm start
     envVars:
       - key: NODE_ENV
-        value: production 
+        value: production
+      - key: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD
+        value: "false"
+      - key: PUPPETEER_CACHE_DIR
+        value: "/opt/render/.cache/puppeteer" 
