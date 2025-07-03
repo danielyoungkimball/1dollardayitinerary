@@ -13,10 +13,7 @@
     "isolatedModules": true,
     "declaration": true,
     "outDir": "./dist",
-    "baseUrl": ".",
-    "paths": {
-      "@1dollardayitinerary/shared": ["../../packages/shared"]
-    }
+    "baseUrl": "."
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
