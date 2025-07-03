@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { formatTime, ItineraryForm, GeneratedItinerary, ItineraryItem, DEFAULT_ITINERARY_PROMPT } from '@1dollardayitinerary/shared';
@@ -25,7 +25,7 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 
 // Webhook route FIRST, with raw body
-app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+app.post('/webhook', express.raw({ type: 'application/json' }), async (req: Request, res: Response) => {
   console.log('[STRIPE] Webhook received');
   const sig = req.headers['stripe-signature'] as string;
   let event: Stripe.Event;
@@ -65,7 +65,7 @@ const transporter = nodemailer.createTransport({
 // In-memory storage for form data (in production, use a database)
 const formDataStore = new Map<string, ItineraryForm>();
 
-app.get('/health', (req, res) => {
+app.get('/health', (req: Request, res: Response) => {
   res.json({ 
     status: 'ok',
     timestamp: new Date().toISOString(),
@@ -77,7 +77,7 @@ app.get('/health', (req, res) => {
   });
 });
 
-app.get('/test', async (req, res) => {
+app.get('/test', async (req: Request, res: Response) => {
   try {
     // Test OpenAI connection
     const completion = await openai.chat.completions.create({
@@ -100,7 +100,7 @@ app.get('/test', async (req, res) => {
   }
 });
 
-app.post('/checkout', async (req, res) => {
+app.post('/checkout', async (req: Request, res: Response) => {
   const formData: ItineraryForm = req.body;
   if (!formData.email) return res.status(400).json({ error: 'Email is required' });
   
@@ -354,7 +354,7 @@ async function sendEmail(email: string, pdfBuffer: Buffer, itinerary: GeneratedI
   }
 }
 
-app.post('/generate', (req, res) => {
+app.post('/generate', (req: Request, res: Response) => {
   const { city, date } = req.body;
   
   // Placeholder response
@@ -375,7 +375,7 @@ app.post('/generate', (req, res) => {
 });
 
 // Manual test endpoint to trigger itinerary/email generation
-app.post('/test-email', async (req, res) => {
+app.post('/test-email', async (req: Request, res: Response) => {
   try {
     const formData: ItineraryForm = req.body;
     console.log('[TEST] Manual test-email trigger:', formData);
@@ -393,7 +393,7 @@ app.post('/test-email', async (req, res) => {
 });
 
 // Test endpoint to see raw OpenAI response
-app.post('/test-openai', async (req, res) => {
+app.post('/test-openai', async (req: Request, res: Response) => {
   try {
     const formData: ItineraryForm = req.body;
     const customPrompt = req.body.customPrompt;
@@ -452,7 +452,7 @@ app.post('/test-openai', async (req, res) => {
 });
 
 // Test endpoint to verify Puppeteer is working
-app.get('/test-puppeteer', async (req, res) => {
+app.get('/test-puppeteer', async (req: Request, res: Response) => {
   try {
     console.log('[TEST-PUPPETEER] Testing Puppeteer...');
     
