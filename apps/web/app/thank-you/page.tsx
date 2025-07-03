@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export default function ThankYouPage() {
   const [email, setEmail] = useState<string>('');
@@ -63,7 +63,7 @@ export default function ThankYouPage() {
           
           <div className="mt-8 pt-6 border-t border-zinc-800">
             <p className="text-zinc-500 text-sm">
-              Check your email in the next few minutes. If you don't see it, check your spam folder.
+              Check your email in the next few minutes. If you don&apos;t see it, check your spam folder.
             </p>
           </div>
           

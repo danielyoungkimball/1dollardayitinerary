@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 const INTERESTS = [
   'Food',
@@ -69,7 +69,7 @@ export default function ItineraryFormPage() {
       }
       // Redirect to Stripe Checkout
       window.location.href = data.url;
-    } catch (err) {
+    } catch {
       setError('Something went wrong. Please try again.');
       setLoading(false);
     }
