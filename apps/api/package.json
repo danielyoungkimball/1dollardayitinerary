@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "ts-node -r tsconfig-paths/register src/index.ts",
-    "lint": "eslint src"
+    "start": "ts-node -r tsconfig-paths/register src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -30,12 +29,5 @@
     "@types/nodemailer": "^6.4.14"
   },
   "devDependencies": {
-    "@eslint/js": "^9.30.0",
-    "@typescript-eslint/eslint-plugin": "^8.35.0",
-    "@typescript-eslint/parser": "^8.35.0",
-    "eslint": "^9.0.0",
-    "globals": "^16.2.0",
-    "tsx": "^4.7.1",
-    "typescript": "^5.3.3"
   }
 }
