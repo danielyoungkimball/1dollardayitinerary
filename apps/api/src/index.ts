@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { formatTime, ItineraryForm, GeneratedItinerary, DEFAULT_ITINERARY_PROMPT } from '@1dollardayitinerary/shared';
+import { formatTime, ItineraryForm, GeneratedItinerary, ItineraryItem, DEFAULT_ITINERARY_PROMPT } from '@1dollardayitinerary/shared';
 import { Stripe } from 'stripe';
 import { OpenAI } from 'openai';
 import * as puppeteer from 'puppeteer';
@@ -236,7 +236,7 @@ async function generatePDF(itinerary: GeneratedItinerary): Promise<Buffer> {
       <!DOCTYPE html>
       <html>
       <head>
-        <meta charset=\"utf-8\">
+        <meta charset="utf-8">
         <title>Your Day Itinerary - ${itinerary.city}</title>
         <style>
           body { font-family: Arial, sans-serif; margin: 40px; }
@@ -261,27 +261,27 @@ async function generatePDF(itinerary: GeneratedItinerary): Promise<Buffer> {
         </style>
       </head>
       <body>
-        <div class=\"header\">
-          <div class=\"title\">Your Perfect Day in ${itinerary.city}</div>
-          <div class=\"subtitle\">${itinerary.date}</div>
+        <div class="header">
+          <div class="title">Your Perfect Day in ${itinerary.city}</div>
+          <div class="subtitle">${itinerary.date}</div>
         </div>
         
-        <div class=\"total-cost\">
+        <div class="total-cost">
           <strong>Estimated Cost: ${itinerary.totalCost}</strong>
         </div>
         
-        ${itinerary.items.map((item: any) => `
-          <div class=\"item\">
-            <div class=\"time\">${item.time} (${item.duration})</div>
-            <div class=\"activity\">${item.activity}</div>
-            <div class=\"location\">📍 ${item.location}</div>
-            <div class=\"description\">${item.description}</div>
-            <div class=\"cost\"><strong>Cost:</strong> ${item.cost || ''}</div>
-            ${item.mapsUrl ? `<div class=\"maps-link\"><a href=\"${item.mapsUrl}\" target=\"_blank\">🗺️ View on Google Maps</a></div>` : ''}
+        ${itinerary.items.map((item: ItineraryItem & { mapsUrl?: string }) => `
+          <div class="item">
+            <div class="time">${item.time} (${item.duration})</div>
+            <div class="activity">${item.activity}</div>
+            <div class="location">📍 ${item.location}</div>
+            <div class="description">${item.description}</div>
+            <div class="cost"><strong>Cost:</strong> ${item.cost || ''}</div>
+            ${item.mapsUrl ? `<div class="maps-link"><a href="${item.mapsUrl}" target="_blank">🗺️ View on Google Maps</a></div>` : ''}
           </div>
         `).join('')}
         
-        <div class=\"tips\">
+        <div class="tips">
           <h3>💡 Tips for Your Day</h3>
           <ul>
             ${itinerary.tips.map((tip: string) => `<li>${tip}</li>`).join('')}
@@ -293,7 +293,7 @@ async function generatePDF(itinerary: GeneratedItinerary): Promise<Buffer> {
     console.log('[PDF] HTML template:', htmlTemplate);
     
     // Puppeteer configuration for different environments
-    const puppeteerOptions: any = {
+    const puppeteerOptions: puppeteer.PuppeteerLaunchOptions = {
       headless: true,
       args: [
         '--no-sandbox',
@@ -386,9 +386,9 @@ app.post('/test-email', async (req, res) => {
     await sendEmail(formData.email, pdfBuffer, itinerary);
 
     res.json({ status: 'ok', message: 'Email sent (if configured correctly)' });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[TEST] Failed to send test email:', err);
-    res.status(500).json({ status: 'error', error: err.message });
+    res.status(500).json({ status: 'error', error: err instanceof Error ? err.message : 'Unknown error' });
   }
 });
 
@@ -425,12 +425,12 @@ app.post('/test-openai', async (req, res) => {
     let parsedResponse;
     try {
       parsedResponse = JSON.parse(response);
-    } catch (parseError: any) {
+    } catch (parseError: unknown) {
       console.log('[TEST-OPENAI] Failed to parse JSON, returning raw response');
       return res.json({
         status: 'success',
         rawResponse: response,
-        parseError: parseError.message,
+        parseError: parseError instanceof Error ? parseError.message : 'Unknown parse error',
         prompt: prompt
       });
     }
@@ -442,11 +442,11 @@ app.post('/test-openai', async (req, res) => {
       prompt: prompt
     });
 
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[TEST-OPENAI] Failed to test OpenAI:', err);
     res.status(500).json({ 
       status: 'error', 
-      error: err.message
+      error: err instanceof Error ? err.message : 'Unknown error'
     });
   }
 });
@@ -456,7 +456,7 @@ app.get('/test-puppeteer', async (req, res) => {
   try {
     console.log('[TEST-PUPPETEER] Testing Puppeteer...');
     
-    const puppeteerOptions: any = {
+    const puppeteerOptions: puppeteer.PuppeteerLaunchOptions = {
       headless: true,
       args: [
         '--no-sandbox',

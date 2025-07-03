@@ -2,6 +2,7 @@
   "name": "@1dollardayitinerary/shared",
   "version": "1.0.1",
   "private": true,
+  "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
@@ -10,6 +11,11 @@
     "lint": "eslint src"
   },
   "devDependencies": {
+    "@eslint/js": "^9.30.0",
+    "@typescript-eslint/eslint-plugin": "^8.35.0",
+    "@typescript-eslint/parser": "^8.35.0",
+    "eslint": "^9.30.0",
+    "globals": "^16.2.0",
     "tsup": "^8.0.0",
     "typescript": "^5.3.3"
   },
@@ -19,4 +25,4 @@
       "require": "./dist/index.js"
     }
   }
-} 
+}
