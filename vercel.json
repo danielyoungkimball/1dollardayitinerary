@@ -1,0 +1,6 @@
+{
+    "buildCommand": "turbo run build --filter=@1dollardayitinerary/web...",
+    "outputDirectory": "apps/web/.next",
+    "framework": "nextjs"
+  }
+  

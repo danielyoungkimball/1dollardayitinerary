@@ -3,9 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "packageManager": "yarn@1.22.22",
-  "workspaces": [
-    "apps/*"
-  ],
+  "workspaces": {
+    "packages": [
+      "apps/*"
+    ],
+    "nohoist": [
+      "**/@types/react",
+      "**/@types/react-dom"
+    ]
+  },
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
