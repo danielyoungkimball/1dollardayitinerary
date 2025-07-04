@@ -15,7 +15,8 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
-    "start": "turbo run start"
+    "start": "turbo run start",
+    "postinstall": "yarn --cwd apps/web install"
   },
   "devDependencies": {
     "@types/react": "^19.1.8",
