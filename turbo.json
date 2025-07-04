@@ -3,17 +3,6 @@
   "globalDependencies": [
     "**/.env.*local"
   ],
-  "env": [
-    "STRIPE_SECRET_KEY",
-    "STRIPE_WEBHOOK_SECRET",
-    "OPENAI_API_KEY",
-    "EMAIL_USER",
-    "EMAIL_PASS",
-    "PORT",
-    "NODE_ENV",
-    "WEB_URL",
-    "API_URL"
-  ],
   "tasks": {
     "build": {
       "dependsOn": [
