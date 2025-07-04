@@ -369,6 +369,7 @@ async function generatePDF(itinerary: GeneratedItinerary): Promise<Buffer> {
     // Puppeteer configuration for different environments
     const browser = await puppeteer.launch({
       headless: true,
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     const page = await browser.newPage();
@@ -515,8 +516,8 @@ app.get('/test-puppeteer', async (req: Request, res: Response) => {
     console.log('[TEST-PUPPETEER] Testing Puppeteer...');
     console.log('[DEBUG] Puppeteer executablePath:', puppeteer.executablePath());
     const browser = await puppeteer.launch({
-      devtools: true,
-      headless: false,
+      headless: true,
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     const page = await browser.newPage();

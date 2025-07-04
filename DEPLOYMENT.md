@@ -14,7 +14,6 @@ OPENAI_API_KEY=sk-your_openai_api_key_here
 EMAIL_USER=your_email@gmail.com
 EMAIL_PASS=your_app_password_here
 PORT=10000
-NODE_ENV=production
 ```
 
 ## Deployment Steps
@@ -43,7 +42,6 @@ NODE_ENV=production
 
 ### Puppeteer Configuration
 The app uses Puppeteer for PDF generation. The configuration automatically:
-- Uses system Chrome in production (`/usr/bin/google-chrome-stable`)
 - Installs Chrome during build process
 - Uses appropriate flags for serverless environment
 
