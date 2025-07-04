@@ -22,7 +22,7 @@
     "nodemailer": "^6.9.8",
     "openai": "^4.28.0",
     "puppeteer": "^22.0.0",
-    "stripe": "^18.1.0"
+    "stripe": "^18.3.0"
   },
   "devDependencies": {
     "typescript": "^5.8.3"
