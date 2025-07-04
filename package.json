@@ -9,5 +9,9 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "start": "turbo run start"
+  },
+  "devDependencies": {
+    "turbo": "^1.12.3",
+    "typescript": "^5.3.3"
   }
 }
