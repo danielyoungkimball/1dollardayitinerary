@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { Stripe } from 'stripe';
 import { OpenAI } from 'openai';
-import * as puppeteer from 'puppeteer';
+import { launch } from 'puppeteer-core';
 import * as nodemailer from 'nodemailer';
 
 dotenv.config();
@@ -367,26 +367,11 @@ async function generatePDF(itinerary: GeneratedItinerary): Promise<Buffer> {
     console.log('[PDF] HTML template:', htmlTemplate);
     
     // Puppeteer configuration for different environments
-    const puppeteerOptions: puppeteer.PuppeteerLaunchOptions = {
+    const browser = await launch({
       headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--single-process',
-        '--disable-gpu'
-      ]
-    };
-
-    // In production, let Puppeteer find Chrome automatically
-    if (process.env.NODE_ENV === 'production') {
-      console.log('[PDF] Running in production mode - using system Chrome');
-    }
-
-    const browser = await puppeteer.launch(puppeteerOptions);
+      executablePath: process.env.CHROME_PATH || '/opt/render/.cache/puppeteer/chrome/linux-127.0.6533.88/chrome-linux64/chrome',
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
     const page = await browser.newPage();
     await page.setContent(htmlTemplate);
     const pdf = await page.pdf({ format: 'A4', margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' } });
@@ -530,25 +515,11 @@ app.get('/test-puppeteer', async (req: Request, res: Response) => {
   try {
     console.log('[TEST-PUPPETEER] Testing Puppeteer...');
     
-    const puppeteerOptions: puppeteer.PuppeteerLaunchOptions = {
+    const browser = await launch({
       headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--single-process',
-        '--disable-gpu'
-      ]
-    };
-
-    if (process.env.NODE_ENV === 'production') {
-      console.log('[TEST-PUPPETEER] Running in production mode');
-    }
-
-    const browser = await puppeteer.launch(puppeteerOptions);
+      executablePath: process.env.CHROME_PATH || '/opt/render/.cache/puppeteer/chrome/linux-127.0.6533.88/chrome-linux64/chrome',
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
     const page = await browser.newPage();
     await page.setContent('<h1>Puppeteer Test</h1>');
     const pdf = await page.pdf({ format: 'A4' });

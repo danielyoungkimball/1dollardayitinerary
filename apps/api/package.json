@@ -19,6 +19,7 @@
     "nodemailer": "^6.9.8",
     "openai": "^4.28.0",
     "puppeteer": "^22.0.0",
+    "puppeteer-core": "^22.0.0",
     "stripe": "^18.1.0",
     "@types/express": "^4.17.21",
     "@types/cors": "^2.8.17",
