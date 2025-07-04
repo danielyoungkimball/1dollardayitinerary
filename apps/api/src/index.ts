@@ -196,8 +196,8 @@ app.post('/checkout', async (req: Request, res: Response) => {
           quantity: 1,
         },
       ],
-      success_url: 'http://localhost:3000/thank-you',
-      cancel_url: 'http://localhost:3000/',
+      success_url: `${process.env.WEB_URL}/thank-you`,
+      cancel_url: `${process.env.WEB_URL}/`,
       metadata: {
         email: formData.email,
         sessionId: Date.now().toString(), // Use as key for form data

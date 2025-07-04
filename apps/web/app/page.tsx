@@ -1,15 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
-
-const INTERESTS = [
-  'Food',
-  'Nature',
-  'Art',
-  'Chill',
-  'Coffee',
-  'Hiking',
-];
+import React, { useState, useRef } from 'react';
 
 export default function ItineraryFormPage() {
   const [form, setForm] = useState({
@@ -20,6 +11,8 @@ export default function ItineraryFormPage() {
     interests: [] as string[],
     email: '',
   });
+  const [interestInput, setInterestInput] = useState('');
+  const interestInputRef = useRef<HTMLInputElement>(null);
   const [touched, setTouched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,18 +26,30 @@ export default function ItineraryFormPage() {
     /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const { name, value, type, checked } = e.target;
-    if (type === 'checkbox') {
-      setForm((prev) => ({
-        ...prev,
-        interests: checked
-          ? [...prev.interests, value]
-          : prev.interests.filter((i) => i !== value),
-      }));
-    } else {
-      setForm((prev) => ({ ...prev, [name]: value }));
-    }
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
     setTouched(true);
+  }
+
+  function handleInterestInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setInterestInput(e.target.value);
+  }
+
+  function handleInterestKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if ((e.key === 'Enter' || e.key === ',') && interestInput.trim()) {
+      e.preventDefault();
+      const newInterest = interestInput.trim();
+      if (!form.interests.includes(newInterest)) {
+        setForm((prev) => ({ ...prev, interests: [...prev.interests, newInterest] }));
+      }
+      setInterestInput('');
+    } else if (e.key === 'Backspace' && !interestInput && form.interests.length > 0) {
+      setForm((prev) => ({ ...prev, interests: prev.interests.slice(0, -1) }));
+    }
+  }
+
+  function removeInterest(interest: string) {
+    setForm((prev) => ({ ...prev, interests: prev.interests.filter((i) => i !== interest) }));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -56,7 +61,7 @@ export default function ItineraryFormPage() {
       // Store form data in localStorage
       localStorage.setItem('itineraryForm', JSON.stringify(form));
       // Call backend to create Stripe Checkout session
-      const res = await fetch('http://localhost:3001/checkout', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
@@ -76,105 +81,89 @@ export default function ItineraryFormPage() {
   }
 
   return (
-    <div className="w-full flex flex-col items-center justify-center px-2 sm:px-0 min-h-screen">
-      <div className="w-full max-w-md sm:max-w-lg bg-zinc-900 shadow-2xl rounded-2xl p-6 sm:p-10 border border-zinc-800">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-center tracking-tight">Build My $1 Day Plan</h1>
-        <p className="text-zinc-400 text-center mb-6 text-base sm:text-lg">Get a custom, timestamped day itinerary for any city, delivered to your email.</p>
-        <form
-          className="space-y-5"
-          onSubmit={handleSubmit}
-          autoComplete="off"
-        >
+    <div>
+      <h1>Build My $1 Day Plan</h1>
+      <p>Get a custom, timestamped day itinerary for any city, delivered to your email.</p>
+      <form onSubmit={handleSubmit} autoComplete="off">
+        <div>
+          <label>City</label>
+          <input
+            type="text"
+            name="city"
+            value={form.city}
+            onChange={handleChange}
+            required
+            placeholder="e.g. Paris"
+          />
+        </div>
+        <div>
+          <label>Date</label>
+          <input
+            type="date"
+            name="date"
+            value={form.date}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div>
+          <label>Start time</label>
+          <input
+            type="time"
+            name="start"
+            value={form.start}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div>
+          <label>End time</label>
+          <input
+            type="time"
+            name="end"
+            value={form.end}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div>
+          <label>Interests</label>
           <div>
-            <label className="block font-medium mb-1 text-zinc-200">City</label>
-            <input
-              type="text"
-              name="city"
-              value={form.city}
-              onChange={handleChange}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-600 text-base"
-              required
-              placeholder="e.g. Paris"
-            />
+            {form.interests.map((interest) => (
+              <span key={interest}>
+                {interest}
+                <button type="button" onClick={() => removeInterest(interest)} aria-label={`Remove ${interest}`}>×</button>
+              </span>
+            ))}
           </div>
-          <div>
-            <label className="block font-medium mb-1 text-zinc-200">Date</label>
-            <input
-              type="date"
-              name="date"
-              value={form.date}
-              onChange={handleChange}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-600 text-base"
-              required
-            />
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <label className="block font-medium mb-1 text-zinc-200">Start time</label>
-              <input
-                type="time"
-                name="start"
-                value={form.start}
-                onChange={handleChange}
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-600 text-base"
-                required
-              />
-            </div>
-            <div className="flex-1">
-              <label className="block font-medium mb-1 text-zinc-200">End time</label>
-              <input
-                type="time"
-                name="end"
-                value={form.end}
-                onChange={handleChange}
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-600 text-base"
-                required
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block font-medium mb-1 text-zinc-200">Interests</label>
-            <div className="flex flex-wrap gap-3">
-              {INTERESTS.map((interest) => (
-                <label key={interest} className="flex items-center gap-1 text-zinc-300 text-base">
-                  <input
-                    type="checkbox"
-                    name="interests"
-                    value={interest}
-                    checked={form.interests.includes(interest)}
-                    onChange={handleChange}
-                    className="accent-blue-500 w-5 h-5"
-                  />
-                  {interest}
-                </label>
-              ))}
-            </div>
-          </div>
-          <div>
-            <label className="block font-medium mb-1 text-zinc-200">Email address</label>
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-600 text-base"
-              required
-              placeholder="you@email.com"
-            />
-            {touched && form.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email) && (
-              <p className="text-red-400 text-sm mt-1">Enter a valid email address.</p>
-            )}
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg disabled:opacity-50 transition text-lg shadow-md"
-            disabled={!allFilled || loading}
-          >
-            {loading ? 'Redirecting…' : 'Build My $1 Day Plan'}
-          </button>
-          {error && <p className="text-red-400 text-center mt-2">{error}</p>}
-        </form>
-      </div>
+          <input
+            ref={interestInputRef}
+            type="text"
+            value={interestInput}
+            onChange={handleInterestInputChange}
+            onKeyDown={handleInterestKeyDown}
+            placeholder="Type an interest and press Enter (e.g. Museums, Food, Parks)"
+          />
+        </div>
+        <div>
+          <label>Email address</label>
+          <input
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            required
+            placeholder="you@email.com"
+          />
+          {touched && form.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email) && (
+            <p>Enter a valid email address.</p>
+          )}
+        </div>
+        <button type="submit" disabled={!allFilled || loading}>
+          {loading ? 'Redirecting…' : 'Build My $1 Day Plan'}
+        </button>
+        {error && <p>{error}</p>}
+      </form>
     </div>
   );
 } 
