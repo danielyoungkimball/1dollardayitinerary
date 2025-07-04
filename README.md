@@ -18,8 +18,6 @@ A microservice where users pay $1 to get a custom, timestamped day itinerary for
 ├── apps/
 │   ├── web/         # Next.js frontend with form
 │   └── api/         # Node.js backend with Stripe, OpenAI, PDF generation
-├── packages/
-│   └── shared/      # Shared utilities and types
 ├── .gitignore
 ├── README.md
 ├── package.json
