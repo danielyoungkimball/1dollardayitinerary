@@ -44,7 +44,6 @@ export function formatTime(date: Date): string {
   });
 }
 
-// Prompt template moved from shared package
 export const DEFAULT_ITINERARY_PROMPT = `
 You are a travel planner AI. Generate a personalized, timestamped itinerary for someone visiting ${'${city}'} on ${'${date}'} from ${'${start}'} to ${'${end}'}. Their interests include: ${'${interests}'}.
 
@@ -89,8 +88,6 @@ Respond ONLY in this strict JSON structure:
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: '2025-05-28.basil',
 });
-
-console.log('Stripe key starts with:', process.env.STRIPE_SECRET_KEY?.slice(0, 8));
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
