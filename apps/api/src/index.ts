@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { Stripe } from 'stripe';
 import { OpenAI } from 'openai';
-import { launch } from 'puppeteer-core';
+import puppeteer from 'puppeteer';
 import * as nodemailer from 'nodemailer';
 
 dotenv.config();
@@ -367,9 +367,8 @@ async function generatePDF(itinerary: GeneratedItinerary): Promise<Buffer> {
     console.log('[PDF] HTML template:', htmlTemplate);
     
     // Puppeteer configuration for different environments
-    const browser = await launch({
+    const browser = await puppeteer.launch({
       headless: true,
-      executablePath: process.env.CHROME_PATH || '/opt/render/.cache/puppeteer/chrome/linux-127.0.6533.88/chrome-linux64/chrome',
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     const page = await browser.newPage();
@@ -515,9 +514,8 @@ app.get('/test-puppeteer', async (req: Request, res: Response) => {
   try {
     console.log('[TEST-PUPPETEER] Testing Puppeteer...');
     
-    const browser = await launch({
+    const browser = await puppeteer.launch({
       headless: true,
-      executablePath: process.env.CHROME_PATH || '/opt/render/.cache/puppeteer/chrome/linux-127.0.6533.88/chrome-linux64/chrome',
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     const page = await browser.newPage();

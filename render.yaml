@@ -13,5 +13,3 @@ services:
         value: "false"
       - key: PUPPETEER_CACHE_DIR
         value: "/opt/render/.cache/puppeteer"
-      - key: CHROME_PATH
-        value: "/opt/render/.cache/puppeteer/chrome/linux-127.0.6533.88/chrome-linux64/chrome"
