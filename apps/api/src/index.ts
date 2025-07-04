@@ -140,7 +140,7 @@ const transporter = nodemailer.createTransport({
 const formDataStore = new Map<string, ItineraryForm>();
 
 app.get('/health', (req: Request, res: Response) => {
-  res.json({ 
+  res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
     services: {
@@ -159,7 +159,7 @@ app.get('/test', async (req: Request, res: Response) => {
       messages: [{ role: "user", content: "Say 'Hello from OpenAI!'" }],
       max_tokens: 10,
     });
-    
+
     res.json({
       status: 'ok',
       openai: completion.choices[0]?.message?.content,
@@ -177,7 +177,7 @@ app.get('/test', async (req: Request, res: Response) => {
 app.post('/checkout', async (req: Request, res: Response) => {
   const formData: ItineraryForm = req.body;
   if (!formData.email) return res.status(400).json({ error: 'Email is required' });
-  
+
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -206,7 +206,7 @@ app.post('/checkout', async (req: Request, res: Response) => {
 
     // Store form data with session ID
     formDataStore.set(session.id, formData);
-    
+
     res.json({ url: session.url });
   } catch (err) {
     console.error('Stripe session creation failed:', err);
@@ -365,7 +365,7 @@ async function generatePDF(itinerary: GeneratedItinerary): Promise<Buffer> {
       </html>
     `;
     console.log('[PDF] HTML template:', htmlTemplate);
-    
+
     // Puppeteer configuration for different environments
     const browser = await puppeteer.launch({
       headless: true,
@@ -414,7 +414,7 @@ async function sendEmail(email: string, pdfBuffer: Buffer, itinerary: GeneratedI
 
 app.post('/generate', (req: Request, res: Response) => {
   const { city, date } = req.body;
-  
+
   // Placeholder response
   res.json({
     itinerary: {
@@ -467,13 +467,13 @@ app.post('/test-openai', async (req: Request, res: Response) => {
       model: "o4-mini",
       messages: [{ role: "user", content: prompt }],
     });
-    
+
     const response = completion.choices[0]?.message?.content;
     console.log('[TEST-OPENAI] Raw OpenAI response:', response);
-    
+
     if (!response) {
-      return res.status(500).json({ 
-        status: 'error', 
+      return res.status(500).json({
+        status: 'error',
         error: 'No response from OpenAI',
         prompt: prompt
       });
@@ -502,8 +502,8 @@ app.post('/test-openai', async (req: Request, res: Response) => {
 
   } catch (err: unknown) {
     console.error('[TEST-OPENAI] Failed to test OpenAI:', err);
-    res.status(500).json({ 
-      status: 'error', 
+    res.status(500).json({
+      status: 'error',
       error: err instanceof Error ? err.message : 'Unknown error'
     });
   }
@@ -527,62 +527,12 @@ app.get('/test-puppeteer', async (req: Request, res: Response) => {
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment; filename=test.pdf');
     res.send(pdf);
-    
+
     console.log('[TEST-PUPPETEER] Puppeteer test successful');
   } catch (error) {
     console.error('[TEST-PUPPETEER] Puppeteer test failed:', error);
-    res.status(500).json({ 
-      status: 'error', 
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined
-    });
-  }
-});
-
-// Debug endpoint to check Chrome paths
-app.get('/debug-chrome', async (req: Request, res: Response) => {
-  try {
-    const { exec } = await import('child_process');
-    const { promisify } = await import('util');
-    const execAsync = promisify(exec);
-    
-    const paths = [
-      '/usr/bin/google-chrome-stable',
-      '/usr/bin/google-chrome',
-      '/usr/bin/chromium-browser',
-      '/usr/bin/chromium',
-      '/opt/render/.cache/puppeteer/chrome/linux-127.0.6533.88/chrome-linux64/chrome',
-      process.env.CHROME_PATH
-    ].filter(Boolean);
-    
-    const results = [];
-    
-    for (const path of paths) {
-      try {
-        const { stdout } = await execAsync(`ls -la "${path}"`);
-        results.push({ path, exists: true, info: stdout.trim() });
-      } catch (error) {
-        results.push({ path, exists: false, error: error instanceof Error ? error.message : 'Unknown error' });
-      }
-    }
-    
-    // Also try to find Chrome in common locations
-    try {
-      const { stdout } = await execAsync('which google-chrome-stable');
-      results.push({ path: 'which google-chrome-stable', exists: true, info: stdout.trim() });
-    } catch (error) {
-      results.push({ path: 'which google-chrome-stable', exists: false, error: error instanceof Error ? error.message : 'Unknown error' });
-    }
-    
-    res.json({
-      chromePaths: results,
-      envVars: {
-        CHROME_PATH: process.env.CHROME_PATH,
-        NODE_ENV: process.env.NODE_ENV,
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
+      status: 'error',
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined
     });
