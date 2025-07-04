@@ -515,7 +515,8 @@ app.get('/test-puppeteer', async (req: Request, res: Response) => {
     console.log('[TEST-PUPPETEER] Testing Puppeteer...');
     
     const browser = await puppeteer.launch({
-      headless: true,
+      devtools: true,
+      headless: false,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     const page = await browser.newPage();
