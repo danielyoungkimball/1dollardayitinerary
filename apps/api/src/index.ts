@@ -513,7 +513,7 @@ app.post('/test-openai', async (req: Request, res: Response) => {
 app.get('/test-puppeteer', async (req: Request, res: Response) => {
   try {
     console.log('[TEST-PUPPETEER] Testing Puppeteer...');
-    
+    console.log('[DEBUG] Puppeteer executablePath:', puppeteer.executablePath());
     const browser = await puppeteer.launch({
       devtools: true,
       headless: false,
@@ -579,7 +579,6 @@ app.get('/debug-chrome', async (req: Request, res: Response) => {
       envVars: {
         CHROME_PATH: process.env.CHROME_PATH,
         NODE_ENV: process.env.NODE_ENV,
-        PUPPETEER_CACHE_DIR: process.env.PUPPETEER_CACHE_DIR
       }
     });
   } catch (error) {
