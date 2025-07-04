@@ -16,7 +16,8 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "start": "turbo run start",
-    "postinstall": "yarn --cwd apps/web install"
+    "postinstall": "yarn --cwd apps/web install",
+    "vercel:install": "cd apps/web && yarn add --dev @types/react @types/react-dom"
   },
   "devDependencies": {
     "@types/react": "^19.1.8",
