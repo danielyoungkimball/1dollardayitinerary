@@ -540,6 +540,57 @@ app.get('/test-puppeteer', async (req: Request, res: Response) => {
   }
 });
 
+// Debug endpoint to check Chrome paths
+app.get('/debug-chrome', async (req: Request, res: Response) => {
+  try {
+    const { exec } = await import('child_process');
+    const { promisify } = await import('util');
+    const execAsync = promisify(exec);
+    
+    const paths = [
+      '/usr/bin/google-chrome-stable',
+      '/usr/bin/google-chrome',
+      '/usr/bin/chromium-browser',
+      '/usr/bin/chromium',
+      '/opt/render/.cache/puppeteer/chrome/linux-127.0.6533.88/chrome-linux64/chrome',
+      process.env.CHROME_PATH
+    ].filter(Boolean);
+    
+    const results = [];
+    
+    for (const path of paths) {
+      try {
+        const { stdout } = await execAsync(`ls -la "${path}"`);
+        results.push({ path, exists: true, info: stdout.trim() });
+      } catch (error) {
+        results.push({ path, exists: false, error: error instanceof Error ? error.message : 'Unknown error' });
+      }
+    }
+    
+    // Also try to find Chrome in common locations
+    try {
+      const { stdout } = await execAsync('which google-chrome-stable');
+      results.push({ path: 'which google-chrome-stable', exists: true, info: stdout.trim() });
+    } catch (error) {
+      results.push({ path: 'which google-chrome-stable', exists: false, error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+    
+    res.json({
+      chromePaths: results,
+      envVars: {
+        CHROME_PATH: process.env.CHROME_PATH,
+        NODE_ENV: process.env.NODE_ENV,
+        PUPPETEER_CACHE_DIR: process.env.PUPPETEER_CACHE_DIR
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    });
+  }
+});
+
 app.listen(port, () => {
   console.log(`API server running at http://localhost:${port}`);
 }); 
